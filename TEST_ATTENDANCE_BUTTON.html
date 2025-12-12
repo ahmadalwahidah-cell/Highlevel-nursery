@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار زر عرض سجل الحضور</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-purple-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+            <i class="fas fa-bug text-red-500 ml-2"></i>
+            اختبار زر عرض سجل الحضور
+        </h1>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">بطاقة الطالب للاختبار</h2>
+            
+            <div class="border-2 border-purple-200 rounded-xl p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 id="student-name-999" class="text-xl font-bold text-gray-800 mb-2">
+                            <i class="fas fa-user text-purple-500 ml-2"></i>
+                            أحمد's محمد "الاختبار"
+                        </h3>
+                        <p class="text-gray-600"><strong>الصف:</strong> KG1</p>
+                    </div>
+                    <div class="bg-purple-100 rounded-full p-3">
+                        <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-purple-200">
+                    <button 
+                        onclick="viewAttendance(999)" 
+                        class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-3 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all">
+                        <i class="fas fa-calendar-check ml-2"></i>
+                        عرض سجل الحضور (اضغط هنا)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">
+            <h3 class="font-bold text-yellow-800 mb-2">
+                <i class="fas fa-info-circle ml-2"></i>
+                التعليمات:
+            </h3>
+            <ul class="text-sm text-gray-700 space-y-1">
+                <li>1. اضغط على زر "عرض سجل الحضور"</li>
+                <li>2. افتح Console (F12)</li>
+                <li>3. راقب الرسائل في Console</li>
+                <li>4. يجب أن تظهر النافذة المنبثقة (Modal)</li>
+            </ul>
+        </div>
+
+        <div id="console-output" class="bg-gray-900 text-green-400 rounded-lg p-4 mb-6 font-mono text-sm max-h-96 overflow-y-auto">
+            <div class="text-white mb-2">Console Output:</div>
+        </div>
+    </div>
+
+    <!-- Modal لعرض سجل الحضور -->
+    <div id="attendanceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold">
+                        <i class="fas fa-calendar-alt ml-2"></i>
+                        سجل الحضور
+                    </h3>
+                    <button onclick="closeModal()" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <p id="studentNameModal" class="text-purple-100 mt-2"></p>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-[70vh]">
+                <div id="attendanceContent" class="space-y-4">
+                    <p class="text-center text-gray-500">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Override console.log to display on page
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsole(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'text-red-400' : 'text-green-400';
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('ERROR: ' + args.join(' '), true);
+        };
+        
+        // The actual viewAttendance function (same as in production)
+        function viewAttendance(studentId) {
+            console.log('🎯 viewAttendance called with studentId:', studentId);
+            
+            try {
+                // الحصول على اسم الطالب من DOM
+                const nameElement = document.getElementById('student-name-' + studentId);
+                const studentName = nameElement ? nameElement.textContent.trim() : 'الطالب';
+                console.log('📝 Student name from DOM:', studentName);
+                
+                document.getElementById('studentNameModal').textContent = 'الطالب: ' + studentName;
+                document.getElementById('attendanceModal').classList.remove('hidden');
+                console.log('✅ Modal opened successfully');
+                
+                // عرض رسالة تحميل
+                document.getElementById('attendanceContent').innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-spinner fa-spin text-purple-500 text-6xl mb-4"></i>
+                        <p class="text-gray-500">جاري تحميل سجل الحضور...</p>
+                    </div>
+                `;
+                console.log('✅ Loading message displayed');
+                
+                // جلب سجل الحضور
+                console.log('🌐 Fetching attendance from API for student ID:', studentId);
+                
+                // For testing, simulate API response
+                setTimeout(() => {
+                    console.log('✅ Mock API response received');
+                    document.getElementById('attendanceContent').innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
+                            <p class="text-gray-700 font-bold">اختبار ناجح!</p>
+                            <p class="text-gray-500 mt-2">الزر يعمل بشكل صحيح</p>
+                            <p class="text-sm text-gray-400 mt-4">اسم الطالب: ${studentName}</p>
+                        </div>
+                    `;
+                }, 1000);
+            } catch (error) {
+                console.error('❌ Critical error in viewAttendance:', error);
+                alert('حدث خطأ: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            console.log('🔒 Closing modal');
+            document.getElementById('attendanceModal').classList.add('hidden');
+        }
+        
+        console.log('✅ Test page loaded successfully');
+        console.log('📋 Click the button to test viewAttendance functionality');
+    </script>
+</body>
+</html>

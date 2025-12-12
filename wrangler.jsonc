@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "highlevel-nursery",
+  "compatibility_date": "2024-01-01",
+  "pages_build_output_dir": "./dist",
+  "compatibility_flags": ["nodejs_compat"],
+  
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "highlevel-nursery-production",
+      "database_id": "53c322a7-697d-4eaa-af20-5d4ec89e92f5"
+    }
+  ],
+  
+  "kv_namespaces": [
+    {
+      "binding": "FINGERPRINT_SETTINGS",
+      "id": "eec9a07397aa47adada8cc9a08a8ba33"
+    }
+  ]
+}
